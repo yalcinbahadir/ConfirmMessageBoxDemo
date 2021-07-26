@@ -1,0 +1,68 @@
+﻿@page "/"
+@using ConfirmMessageBoxDemo.Data
+@using Demo.Library
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Students)
+        {
+            <tr>
+                <th scope="row">@student.Id</th>
+                <td>@student.Name</td>
+                <td><button class="btn btn-link" type="button" @onclick="@(()=> { ConfirmDelete(student);})">Delete</button></td>
+            </tr>
+        }
+
+
+    </tbody>
+</table>
+<Confirm @ref="Confirm"  ConfirmationChanged="CatchConfirmation" ></Confirm>
+
+
+@code{
+
+    public List<Student> Students { get; set; } = new List<Student>();
+    public Student StudentToDelete { get; set; }
+    public Confirm Confirm { get; set; }
+    protected override void OnInitialized()
+    {
+        Students = new List<Student>
+        {
+            new Student{ Id=1, Name="Bahadir" },
+            new Student{ Id=2, Name="Ali" },
+            new Student{ Id=3, Name="Tarik" },
+        };
+    }
+
+    private void ConfirmDelete(Student student)
+    {
+        if (student is not null)
+        {
+            StudentToDelete = student;
+            Confirm.Title = "Confirm delete";
+            Confirm.Message = $"Are you sure you want to delete {student.Name}";
+            Confirm.Show();
+        }
+    }
+
+    private void CatchConfirmation(bool deleteConfirmation)
+    {
+        if (deleteConfirmation)
+        {
+            Students.Remove(StudentToDelete);
+            StateHasChanged();
+        }
+        else
+        {
+            StudentToDelete = null;
+        }
+    }
+
+}
+
